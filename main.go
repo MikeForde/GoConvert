@@ -27,9 +27,19 @@ func (m myTheme) Font(s fyne.TextStyle) fyne.Resource {
 func (m myTheme) Color(name fyne.ThemeColorName, variant fyne.ThemeVariant) color.Color {
 	switch name {
 	case theme.ColorNameDisabled:
-		return color.Black 
+		return color.RGBA{R: 120, G: 120, B: 120, A: 255} // Light gray for disabled text
 	case theme.ColorNameForeground:
-		return color.Black
+		return color.RGBA{R: 0, G: 0, B: 0, A: 255} // Black for foreground text
+	case theme.ColorNameBackground:
+		return color.RGBA{R: 250, G: 250, B: 250, A: 255} // Very light gray for background
+	case theme.ColorNameInputBackground:
+		return color.RGBA{R: 240, G: 240, B: 240, A: 255} // Slightly darker gray for input fields
+	case theme.ColorNameButton:
+		return color.RGBA{R: 220, G: 220, B: 220, A: 255} // Light gray for button background
+	case theme.ColorNameHover:
+		return color.RGBA{R: 180, G: 180, B: 180, A: 255} // Slightly darker gray for hover effects
+	case theme.ColorNameOverlayBackground:
+		return color.RGBA{R: 255, G: 255, B: 255, A: 255} // White for overlay background
 	default:
 		return theme.DefaultTheme().Color(name, variant)
 	}
