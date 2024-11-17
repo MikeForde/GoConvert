@@ -4,19 +4,19 @@ import (
 	"encoding/json"
 	"strings"
 	"time"
-	"myapp/models"
+	. "myapp/models"
 )
 
 func HL7toFHIR(hl7Message string) (string, error) {
 	lines := strings.Split(hl7Message, "\n")
 
 	// Define the data - note we only need to add the array elements as the single elements are already members
-	data := models.HL7FHIRData{
-        Medication:    []models.Medication{},
-        Allergies:     []models.Allergy{},
-        Conditions:    []models.Condition{},
-        Observations:  []models.Observation{},
-        Immunizations: []models.Immunization{},
+	data := HL7FHIRData{
+        Medication:    []Medication{},
+        Allergies:     []Allergy{},
+        Conditions:    []Condition{},
+        Observations:  []Observation{},
+        Immunizations: []Immunization{},
     }
 
 	for _, line := range lines {
@@ -32,7 +32,7 @@ func HL7toFHIR(hl7Message string) (string, error) {
             }
             data.PackageUUID = segments[9]
 		case "PID":
-			data.Patient = models.Patient{
+			data.Patient = Patient{
                 Name:         parseSubfield(segments[5], 0),
                 Given:        parseSubfield(segments[5], 1),
                 Nation:       parseSubfield(segments[11], 3),
@@ -55,14 +55,14 @@ func HL7toFHIR(hl7Message string) (string, error) {
             medicationName := segments[5]
             date, _ := parseHL7DateTime(segments[3])
             if len(segments) > 6 {
-                data.Medication = append(data.Medication, models.Medication{
+                data.Medication = append(data.Medication, Medication{
                     Name:   medicationName,
                     Date:   date,
                     Dosage: segments[6],
                 })
             } else {
                 parts := strings.Split(medicationName, "^")
-                immunization := models.Immunization{
+                immunization := Immunization{
                     Name:   parts[0],
                     Date:   date,
                 }
@@ -75,7 +75,7 @@ func HL7toFHIR(hl7Message string) (string, error) {
             }
 		case "AL1":
 			if len(segments) > 6 {
-                data.Allergies = append(data.Allergies, models.Allergy{
+                data.Allergies = append(data.Allergies, Allergy{
                     Name:        parseSubfield(segments[3], 1),
                     Criticality: map[string]string{"U": "low", "SV": "high", "MO": "moderate", "MI": "mild"}[segments[4]],
                     Date:        segments[6],
@@ -83,14 +83,14 @@ func HL7toFHIR(hl7Message string) (string, error) {
             }
 		case "DG1":
 			if len(segments) > 5 {
-                data.Conditions = append(data.Conditions, models.Condition{
+                data.Conditions = append(data.Conditions, Condition{
                     Name: parseSubfield(segments[3], 1),
                     Date: segments[5],
                 })
             }
 		case "OBX":
 			if len(segments) > 12 {
-                data.Observations = append(data.Observations, models.Observation{
+                data.Observations = append(data.Observations, Observation{
                     Name:  parseSubfield(segments[3], 1),
                     Value: strings.TrimSpace(segments[5] + " " + segments[6]),
                     Date:  segments[12],
