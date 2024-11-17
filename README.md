@@ -20,7 +20,7 @@ A graphical application to convert **HL7 v2.8** messages into **MongoDB JSON** f
 
 ### Prerequisites
 
-- **Go 1.17 or later** installed on your system.
+- **Go 1.18 or later** installed on your system.
 - Fyne CLI for GUI packaging (optional for building standalone executables).
 
 ### Clone the Repository
