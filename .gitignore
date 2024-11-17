@@ -1,3 +1,4 @@
 .env
 myapp*
 .DS_Store
+fyneapp.toml
