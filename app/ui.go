@@ -21,13 +21,13 @@ func Run() {
 
 	// UI Elements
 	inputEntry := widget.NewMultiLineEntry()
-	inputEntry.SetPlaceHolder("Paste HL7 or MongoDB JSON content here...")
+	inputEntry.SetPlaceHolder("Paste HL7 2.x or IPS MERN MongoDB JSON content here...")
 
 	// Dropdown for selecting conversion type
 	conversionTypes := []string{
-		"HL7 to MongoDB",
-		"MongoDB to FHIR",
-		"HL7 to FHIR",
+		"HL7 2.x to IPS MERN MongoDb JSON",
+		"IPS MERN MongoDb JSON to IPS FHiR",
+		"HL7 2.x to IPS FHiR",
 	}
 	conversionSelect := widget.NewSelect(conversionTypes, nil)
 	conversionSelect.SetSelected(conversionTypes[0]) // Default to "HL7 to MongoDB"
@@ -44,11 +44,11 @@ func Run() {
 		var err error
 
 		switch conversionSelect.Selected {
-		case "HL7 to MongoDB":
+		case "HL7 2.x to IPS MERN MongoDb JSON":
 			convertedJSON, err = HL7toMongoDb(content)
-		case "MongoDB to FHIR":
+		case "IPS MERN MongoDb JSON to IPS FHiR":
 			convertedJSON, err = GenerateIPSBundleFromMongo(content)
-		case "HL7 to FHIR":
+		case "HL7 2.x to IPS FHiR":
 			mongoJSON, err := HL7toMongoDb(content)
 			if err == nil {
 				convertedJSON, err = GenerateIPSBundleFromMongo(mongoJSON)
