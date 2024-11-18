@@ -102,11 +102,11 @@ func HL7toMongoDb(hl7Message string) (string, error) {
 		}
 	}
 
-	fhirJSON, err := json.MarshalIndent(data, "", "  ")
+	mongodbJSON, err := json.MarshalIndent(data, "", "  ")
 	if err != nil {
 		return "", err
 	}
-	return string(fhirJSON), nil
+	return string(mongodbJSON), nil
 }
 
 // Helper functions for HL7 parsing
