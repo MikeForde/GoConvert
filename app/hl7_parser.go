@@ -1,6 +1,7 @@
 package app
 
 import (
+    "fmt"
 	"encoding/json"
 	"strings"
 	"time"
@@ -27,7 +28,7 @@ func HL7toMongoDb(hl7Message string) (string, error) {
 
 		switch segments[0] {
 		case "MSH":
-			if timestamp, err := parseHL7DateTime(segments[6]); err == nil {
+			if timestamp, err := parseHL7DateOrDateTime(segments[6]); err == nil {
                 data.TimeStamp = timestamp
             }
             data.PackageUUID = segments[9]
@@ -38,7 +39,7 @@ func HL7toMongoDb(hl7Message string) (string, error) {
                 Nation:       parseSubfield(segments[11], 3),
                 Organization: parseSubfield(segments[3], 3),
             }
-            if dob, err := parseHL7Date(segments[7]); err == nil {
+            if dob, err := parseHL7DateOrDateTime(segments[7]); err == nil {
                 data.Patient.DOB = dob
             }
             switch strings.ToLower(segments[8]) {
@@ -53,7 +54,7 @@ func HL7toMongoDb(hl7Message string) (string, error) {
             data.Patient.Practitioner = segments[2]
 		case "RXA":
             medicationName := segments[5]
-            date, _ := parseHL7DateTime(segments[3])
+            date, _ := parseHL7DateOrDateTime(segments[3])
             if len(segments) > 6 {
                 data.Medication = append(data.Medication, Medication{
                     Name:   medicationName,
@@ -75,25 +76,28 @@ func HL7toMongoDb(hl7Message string) (string, error) {
             }
 		case "AL1":
 			if len(segments) > 6 {
+                date, _ := parseHL7DateOrDateTime(segments[6])
                 data.Allergies = append(data.Allergies, Allergy{
                     Name:        parseSubfield(segments[3], 1),
                     Criticality: map[string]string{"U": "low", "SV": "high", "MO": "moderate", "MI": "mild"}[segments[4]],
-                    Date:        segments[6],
+                    Date:        date,
                 })
             }
 		case "DG1":
 			if len(segments) > 5 {
+                date, _ := parseHL7DateOrDateTime(segments[5])
                 data.Conditions = append(data.Conditions, Condition{
                     Name: parseSubfield(segments[3], 1),
-                    Date: segments[5],
+                    Date: date,
                 })
             }
 		case "OBX":
 			if len(segments) > 12 {
+                date, _ := parseHL7DateOrDateTime(segments[12])
                 data.Observations = append(data.Observations, Observation{
                     Name:  parseSubfield(segments[3], 1),
                     Value: strings.TrimSpace(segments[5] + " " + segments[6]),
-                    Date:  segments[12],
+                    Date:  date,
                 })
             }
 		
@@ -118,18 +122,20 @@ func parseSubfield(field string, index int) string {
 	return ""
 }
 
-func parseHL7DateTime(input string) (string, error) {
+func parseHL7DateOrDateTime(input string) (string, error) {
+	// Try to parse as long form (date and time)
 	t, err := time.Parse("20060102150405", input)
-	if err != nil {
-		return "", err
+	if err == nil {
+		return t.Format("2006-01-02T15:04:05.000Z"), nil
 	}
-	return t.Format("2006-01-02T15:04:05.000Z"), nil
+
+	// If parsing as long form fails, try short form (date only)
+	t, err = time.Parse("20060102", input)
+	if err == nil {
+		return t.Format("2006-01-02T15:04:05.000Z"), nil
+	}
+
+	// If both parsing attempts fail, return an error
+	return "", fmt.Errorf("invalid HL7 date format: %s", input)
 }
 
-func parseHL7Date(input string) (string, error) {
-	t, err := time.Parse("20060102", input)
-	if err != nil {
-		return "", err
-	}
-	return t.Format(time.RFC3339), nil
-}

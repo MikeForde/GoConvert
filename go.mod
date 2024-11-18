@@ -2,7 +2,10 @@ module myapp
 
 go 1.23
 
-require fyne.io/fyne/v2 v2.5.2
+require (
+	fyne.io/fyne/v2 v2.5.2
+	github.com/google/uuid v1.1.2
+)
 
 require (
 	fyne.io/systray v1.11.0 // indirect
