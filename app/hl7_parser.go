@@ -7,7 +7,7 @@ import (
 	. "myapp/models"
 )
 
-func HL7toFHIR(hl7Message string) (string, error) {
+func HL7toMongoDb(hl7Message string) (string, error) {
 	lines := strings.Split(hl7Message, "\n")
 
 	// Define the data - note we only need to add the array elements as the single elements are already members

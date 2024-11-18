@@ -25,7 +25,7 @@ func Run() {
 			return
 		}
 
-		convertedJSON, err := HL7toFHIR(hl7Content)
+		convertedJSON, err := HL7toMongoDb(hl7Content)
 		if err != nil {
 			dialog.ShowError(err, myWindow)
 			return
